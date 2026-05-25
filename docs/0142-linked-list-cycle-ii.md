@@ -37,6 +37,28 @@
 4. 让 `p` 与 `slow` 同时每次走一步，直到二者相等；该结点即环入口。  
 5. 若循环结束仍未相遇，返回 `nil`（无环）。
 
+### 为什么“第二次相遇”就是入口（推断过程）
+
+设：
+
+- 从头结点到环入口长度为 `a`；
+- 从入口到首次相遇点长度为 `b`；
+- 环长度为 `L`。
+
+当慢指针首次到达相遇点时，慢指针一共走了 `a + b` 步。快指针每次比慢指针多走一步，因此快指针总步数是 `2(a+b)`。  
+两者走过的步数差一定是环长度的整数倍：
+
+`2(a+b) - (a+b) = kL`  ⇒  `a + b = kL`。
+
+于是得到：
+
+`a = kL - b`。
+
+右边含义是：从**相遇点**再往前走 `kL-b` 步，等价于先走到本圈入口（还需 `L-b` 步），再绕若干整圈，最终会落在入口。  
+也就是说：从相遇点出发，走 `a` 步会到入口；从头结点出发，走 `a` 步也正好到入口。
+
+所以把一个指针放回头结点，另一个留在首次相遇点，两者同速一步一步走，必然在入口再次相遇。
+
 ### 复杂度
 
 - **时间**：`O(n)`。快慢指针判环 + 定位入口都在线性步数内完成。  
@@ -58,3 +80,25 @@
 | [160. 相交链表](https://leetcode.cn/problems/intersection-of-two-linked-lists/) | 也是双指针步数对齐思想，目标是找相交起点。 |
 
 **备注**：也可用哈希表记录访问过的结点，首次重复访问即入口，代码直观但空间是 `O(n)`；面试更推荐本题的 Floyd 常数空间解法。
+
+---
+
+## 流程图解
+
+```mermaid
+flowchart LR
+ H([头结点 Head]):::start -->|走 a 步| E([环入口 Entry]):::highlight
+ E -->|走 b 步| M([首次相遇点 Meet]):::primary
+ M -->|再走 a 步<br/>等价 kL-b 步| E
+ E -.环长度为 L.-> E
+ P([指针 P 从 Head 出发]):::secondary -->|每次一步| E
+ Q([指针 Q 从 Meet 出发]):::secondary -->|每次一步| E
+ E --> X([第二次相遇点<br/>就是入口]):::ending
+
+ classDef default fill:#E8F4F8,stroke:#90CDF4,color:#2D3748,stroke-width:2px
+ classDef primary fill:#E8F4F8,stroke:#90CDF4,color:#2D3748,stroke-width:2px
+ classDef highlight fill:#FED7AA,stroke:#ED8936,color:#744210,stroke-width:2px
+ classDef start fill:#C6F6D5,stroke:#68D391,color:#276749,stroke-width:2px
+ classDef ending fill:#FED7D7,stroke:#FC8181,color:#C53030,stroke-width:2px
+ classDef secondary fill:#EDF2F7,stroke:#A0AEC0,color:#4A5568,stroke-width:1px
+```
